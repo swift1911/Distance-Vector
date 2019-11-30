@@ -6,6 +6,7 @@
   "dependencies": {
     "echarts": "^4.5.0",
     "echarts-gl": "^1.1.1",
+    "file-saver": "^2.0.2",
     "parcel-bundler": "^1.12.4",
     "vue": "^2.6.10",
     "vue-echarts": "^4.0.4",

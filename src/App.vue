@@ -6,6 +6,11 @@
         <button type="button" class="btn btn-light" @click="addNode">Add Node</button>
         <button type="button" class="btn btn-danger" @click="cleanGraphData">Reset</button>
         <button type="button" class="btn btn-warning" @click="deleteNode">Delete Node</button>
+        <button type="button" class="btn btn-light" @click="exportData">Export Log Data</button>
+        <div class="input-group input-group-sm mb-3">
+            <input type="text" v-model="loopNumber" class="form-control" placeholder="Node Number" aria-label="Small" aria-describedby="inputGroup-sizing-sm">
+            <button type="button" class="btn btn-light" @click="generateGraphWithNumber">Generate Graph</button>
+        </div>
         <div class="row">
             <div v-for="item in graphData.nodes" v-bind:key="item.name" class="col">
                 <a>Node {{item.name}}</a>
@@ -34,6 +39,7 @@
 
 <script>
 import ECharts from 'vue-echarts'
+import { saveAs } from 'file-saver';
 
 export default {
   components: {
@@ -100,6 +106,7 @@ export default {
         this.nodeid = 0;
     },
     addNode(){
+        this.step ++;
         this.graphData.nodes.push({
             name: this.nodeid.toString(),
             x: Math.random(),
@@ -125,7 +132,23 @@ export default {
             var o = this.calcRouteTable(e);
             this.distances[e.name]= o.distances;
             this.parents[e.name] = o.parents;
+            
         });
+
+        this.historyData[this.step] = [];
+        for(var item in this.graphData.nodes){
+            this.historyData[this.step][item] = [];
+            for(var k in this.parents[item]){
+                var v = this.parents[item][k];
+                if(v!=null){
+                    this.historyData[this.step][item].push({
+                        dst: k,
+                        distance: this.distances[item][k],
+                        next: v
+                    });
+                }
+            }
+        }
     },
     calcRouteTable(source){
         var vertexes = this.graphData.nodes;
@@ -150,7 +173,7 @@ export default {
             parents[vertexes[i].name] = null;
         }
         distances[source.name] = 0;
-        for(var i =0 ; i< vertexes.length - 1 ; i++){
+        for(var i =0 ; i< vertexes.length - 1 ; i++) {
             for (var j = 0; j < edges.length; j++) {
                     c = edges[j];
                     if (distances[c.source] + c.value < distances[c.target]) {
@@ -185,7 +208,34 @@ export default {
             }
         }
         this.nodeid --;
+        this.step ++;
         this.refreshRouteTable();
+    },
+    exportData(){
+        var printstr = '';
+        for(var step = 1; step < this.historyData.length ; step++){
+            var nodeData = this.historyData[step];
+            printstr += `STEP ${step} \n`
+            for( var node = 0; node < nodeData.length ; node++){
+                var lineData = nodeData[node];
+                printstr += `Node ${node}\n`;
+                printstr += `DST DISTANCE NEXT \n`;
+                for( var line = 0; line< lineData.length ; line ++){
+                    var item = lineData[line];
+                    printstr += `${item.dst}    ${item.distance}        ${item.next} \n`
+                };
+            }
+            printstr += `----------------------- \n`
+            printstr += `\n`
+        }
+        var blob = new Blob([printstr], {type: "text/plain;charset=utf-8"});
+        saveAs(blob, "historyData.txt");
+    },
+    generateGraphWithNumber(){
+        this.cleanGraphData();
+        for(var i = 0; i< this.loopNumber ;i++){
+            this.addNode();
+        }
     }
   },
   mounted(){
@@ -201,7 +251,10 @@ export default {
       parents: {},
       initOptions: {
         renderer: 'svg'
-      }
+      },
+      historyData: [],
+      step: 0,
+      loopNumber: 10
     }
   }
 }
