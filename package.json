@@ -1,0 +1,25 @@
+{
+  "name": "distance-vector-app-2",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "dependencies": {
+    "echarts": "^4.5.0",
+    "echarts-gl": "^1.1.1",
+    "parcel-bundler": "^1.12.4",
+    "vue": "^2.6.10",
+    "vue-echarts": "^4.0.4",
+    "vue-hot-reload-api": "^2.3.4"
+  },
+  "devDependencies": {
+    "@vue/component-compiler-utils": "^3.0.2",
+    "vue-template-compiler": "^2.6.10"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "parcel src/index.html -p 8000",
+    "build": "parcel build src/index.html --out-dir /Users/xielu/dev/Distance-Vector"
+  },
+  "author": "",
+  "license": "ISC"
+}
